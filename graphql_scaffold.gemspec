@@ -7,7 +7,6 @@ Gem::Specification.new do |s|
   s.date        = "2019-11-08"
   s.platform    = Gem::Platform::RUBY  
   s.summary     = "A good way to automatize graphql models"
-  s.description = "A good way to automatize graphql models"
   s.authors     = ['Arthur Molina']
   s.email       = 'arthurmolina@gmail.com'
   s.homepage    = 'https://arthurmolina.com'
