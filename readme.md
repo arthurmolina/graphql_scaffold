@@ -2,11 +2,9 @@
 
 [![Build Status](https://travis-ci.org/arthurmolina/graphql-ruby.svg?branch=master)](https://travis-ci.org/arthurmolina/graphql_scaffold)
 [![Gem Version](https://badge.fury.io/rb/graphql_scaffold.svg)](https://rubygems.org/gems/graphql_scaffold)
-[![Code Climate](https://codeclimate.com/github/arthurmolina/graphql_scaffold/badges/gpa.svg)](https://codeclimate.com/github/arthurmolina/graphql_scaffold)
-[![Test Coverage](https://codeclimate.com/github/arthurmolina/graphql_scaffold/badges/coverage.svg)](https://codeclimate.com/github/arthurmolina/graphql_scaffold)
-[![GitHub](https://img.shields.io/github/license/arthurmolina/graphql_scaffold)]
+[![GitHub](https://img.shields.io/github/license/arthurmolina/graphql_scaffold)](https://img.shields.io/github/license/arthurmolina/graphql_scaffold)
 
-Rails generator for scaffolding models with [Graphql-Ruby](https://github.com/rmosolgo/graphql-ruby/).
+Rails generator for scaffolding models with [GraphQL-Ruby](https://github.com/rmosolgo/graphql-ruby/).
 
 ## Installation
 
