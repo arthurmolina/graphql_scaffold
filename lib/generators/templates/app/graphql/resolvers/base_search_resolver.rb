@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Resolvers
   class BaseSearchResolver
     include SearchObject.module(:graphql)
@@ -52,31 +54,31 @@ module Resolvers
       return '' if not has_comparison?(values)
 
       values[:field] + case values[:operator]
-      when "equal", "in"
+      when 'equal', 'in'
         " in (<var!>#{values[:value].to_json}</var!>)"
-      when "greater_than"
+      when 'greater_than'
         " > <var!>#{values[:value].to_json}</var!>"
-      when "greater_than_or_equal_to"
+      when 'greater_than_or_equal_to'
         " >= <var!>#{values[:value].to_json}</var!>"
-      when "ilike"
+      when 'ilike'
         " ilike <var!>#{values[:value].to_json}</var!>"
-      when "is_null"
+      when 'is_null'
         " is #{values[:value].downcase == 'true' ? '' : 'not'} null"
-      when "like"
+      when 'like'
         " like <var!>#{values[:value].to_json}</var!>"
-      when "less_than"
+      when 'less_than'
         " < <var!>#{values[:value].to_json}</var!>"
-      when "less_than_or_equal_to"
+      when 'less_than_or_equal_to'
         " <= <var!>#{values[:value].to_json}</var!>"
-      when "not_equal", "not_in"
+      when 'not_equal', 'not_in'
         " not in (<var!>#{values[:value].to_json}</var!>)"
-      when "not_ilike"
+      when 'not_ilike'
         " not ilike <var!>#{values[:value].to_json}</var!>"
-      when "not_like"
+      when 'not_like'
         " not like <var!>#{values[:value].to_json}</var!>"
-      when "not_similar"
+      when 'not_similar'
         " not similar to <var!>#{values[:value].to_json}</var!>"
-      when "similar"
+      when 'similar'
         " similar to <var!>#{values[:value].to_json}</var!>"
       else
         ''
