@@ -5,7 +5,7 @@ AllCops:
   DisabledByDefault: true
   TargetRubyVersion: 2.6.5
   Exclude:
-    - 'readme.rb'
+    - 'readme.mb'
     - 'lib/generators/templates/**/*'
 
 # def ...
