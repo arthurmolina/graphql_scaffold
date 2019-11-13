@@ -46,16 +46,31 @@ class GraphqlScaffoldGenerator < Rails::Generators::Base
     copy_file 'app/graphql/types/enums/operator.rb', 'app/graphql/types/enums/operator.rb'
     copy_file 'app/graphql/types/enums/sort_dir.rb', 'app/graphql/types/enums/sort_dir.rb'
     copy_file 'app/graphql/types/date_time_type.rb', 'app/graphql/types/date_time_type.rb'
+    copy_file 'app/graphql/types/base_field.rb', 'app/graphql/types/base_field.rb'
+    copy_file 'app/graphql/mutations/base_mutation.rb', 'app/graphql/mutations/base_mutation.rb'
   end
 
   def generate_graphql_query
-    template 'app/graphql/types/enums/table_field.rb', "app/graphql/types/enums/#{plural_name}_field.rb"
-    template 'app/graphql/types/table_type.rb', "app/graphql/types/#{singular_name}_type.rb"
-    template 'app/graphql/resolvers/table_search.rb', "app/graphql/resolvers/#{plural_name}_search.rb"
+    template 'app/graphql/types/enums/table_field.rb', "app/graphql/types/enums/#{plural_name_snaked}_field.rb"
+    template 'app/graphql/types/table_type.rb', "app/graphql/types/#{singular_name_snaked}_type.rb"
+    template 'app/graphql/resolvers/table_search.rb', "app/graphql/resolvers/#{plural_name_snaked}_search.rb"
+    template 'app/graphql/mutations/change_table.rb', "app/graphql/mutations/change_#{singular_name_snaked}.rb"
+    template 'app/graphql/mutations/create_table.rb', "app/graphql/mutations/create_#{singular_name_snaked}.rb"
+    template 'app/graphql/mutations/destroy_table.rb', "app/graphql/mutations/destroy_#{singular_name_snaked}.rb"
   end
 
   def add_in_query_type
-    inject_into_file 'app/graphql/types/query_type.rb', "    field :all_#{plural_name}, function: Resolvers::#{plural_name_camelized}Search\n", after: "class QueryType < Types::BaseObject\n"
+    inject_into_file(
+      'app/graphql/types/query_type.rb', 
+      "    field :all_#{plural_name_snaked}, function: Resolvers::#{plural_name_camelized}Search\n", 
+      after: "class QueryType < Types::BaseObject\n")
+
+    inject_into_file(
+      'app/graphql/types/mutation_type.rb', 
+      "\n    field :create_#{singular_name_snaked}, mutation: Mutations::Create#{singular_name_camelized}" +
+      "\n    field :change_#{singular_name_snaked}, mutation: Mutations::Change#{singular_name_camelized}" +
+      "\n    field :destroy_#{singular_name_snaked}, mutation: Mutations::Destroy#{singular_name_camelized}\n",
+      after: "class MutationType < Types::BaseObject\n")
   end
 
 end

@@ -11,16 +11,24 @@ module GraphqlScaffoldCommonMethods
     name.underscore.singularize
   end
 
-  def single_name_camelized
-    singular_name.gsub(' ', '_').camelcase
+  def singular_name_snaked
+    singular_name.gsub(' ', '_')
+  end
+
+  def singular_name_camelized
+    singular_name_snaked.camelcase
   end
 
   def plural_name
     name.underscore.pluralize
   end
 
+  def plural_name_snaked
+    plural_name.gsub(' ', '_')
+  end
+
   def plural_name_camelized
-    plural_name.gsub(' ', '_').camelcase
+    plural_name_snaked.camelcase
   end
 
   def model_name

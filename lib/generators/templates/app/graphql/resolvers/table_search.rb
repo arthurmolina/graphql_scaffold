@@ -5,7 +5,7 @@ class Resolvers::<%= plural_name_camelized %>Search < Resolvers::BaseSearchResol
   # scope is starting point for search
   scope { <%= model_name %>.all }
 
-  type types[Types::<%= single_name_camelized %>Type]
+  type types[Types::<%= singular_name_camelized %>Type]
 
   ### Pagination
   option :first, type: types.Int, with: :apply_first
