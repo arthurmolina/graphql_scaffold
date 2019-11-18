@@ -95,5 +95,25 @@ module Resolvers
       [expression, values]
     end
 
+    # https://stackoverflow.com/questions/5826210/rails-order-with-nulls-last
+    def case_sort(field, sort_direction)
+      case sort_direction
+      when 'asc'
+        "#{field} asc"
+      when 'asc_nulls_first'
+        "CASE WHEN #{field} IS NOT NULL THEN 1 ELSE 0 END, #{field} ASC"
+      when 'asc_nulls_last'
+        "CASE WHEN #{field} IS NULL THEN 1 ELSE 0 END, #{field} ASC"
+      when 'desc'
+        "#{field} desc"
+      when 'desc_nulls_first'
+        "CASE WHEN #{field} IS NOT NULL THEN 1 ELSE 0 END, #{field} DESC"
+      when 'desc_nulls_last'
+        "CASE WHEN #{field} IS NULL THEN 1 ELSE 0 END, #{field} DESC"
+      else
+        ''
+      end
+    end
+
   end
 end

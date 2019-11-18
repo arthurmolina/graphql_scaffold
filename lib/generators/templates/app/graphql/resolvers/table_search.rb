@@ -28,7 +28,9 @@ class Resolvers::<%= plural_name_camelized %>Search < Resolvers::BaseSearchResol
   option :sort_by, type: types[<%= plural_name_camelized %>OrderBy], with: :apply_sort_by
 
   def apply_sort_by(scope, value)
-    scope.order( value.map{|arg| "#{arg[:field]} #{arg[:sort_direction]} "}.join(', ') )
+    scope.order( value.map{|arg| 
+      Types::Enums::<%= plural_name_camelized %>Field.values.include?(arg[:field]) ? case_sort(arg[:field], arg[:sort_direction]) : ''
+    }.join(', ') )
   end
 
 
@@ -43,7 +45,7 @@ class Resolvers::<%= plural_name_camelized %>Search < Resolvers::BaseSearchResol
   ### Booleans
 <% for attribute in columns_types -%>
 <% if attribute[:type] == 'Boolean' -%>
-  option(:<%= attribute[:name] %>, type: types.Boolean, description: 'Filter for <%= attribute[:name] %>', default: true) { |scope, value| scope.where(<%= attribute[:name] %>: value)}
+  option(:<%= attribute[:name] %>, type: types.Boolean, description: 'Filter for <%= attribute[:name] %>') { |scope, value| scope.where(<%= attribute[:name] %>: value)}
 <% end -%>
 <% end -%>
 
