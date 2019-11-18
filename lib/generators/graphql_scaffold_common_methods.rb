@@ -89,7 +89,7 @@ module GraphqlScaffoldCommonMethods
 
   def require_gems
     gems = {
-      'graphql' => '1.8.13',
+      'graphql' => '1.9.15',
       'search_object' => '1.2.0',
       'search_object_graphql' => '0.1'
     }

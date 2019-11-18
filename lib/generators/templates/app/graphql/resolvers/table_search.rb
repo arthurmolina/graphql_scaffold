@@ -28,7 +28,7 @@ class Resolvers::<%= plural_name_camelized %>Search < Resolvers::BaseSearchResol
   option :sort_by, type: types[<%= plural_name_camelized %>OrderBy], with: :apply_sort_by
 
   def apply_sort_by(scope, value)
-    scope.order( value.map{|arg| arg.arguments.to_h.values.join(' ')}.join(', ') )
+    scope.order( value.map{|arg| "#{arg[:field]} #{arg[:sort_direction]} "}.join(', ') )
   end
 
 
