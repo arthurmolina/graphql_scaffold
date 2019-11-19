@@ -3,7 +3,7 @@ require 'search_object/plugin/graphql'
 class Resolvers::<%= plural_name_camelized %>Search < Resolvers::BaseSearchResolver
 
   # scope is starting point for search
-  scope { <%= model_name %>.all }
+  scope { <%= singular_name_camelized %>.all }
 
   type types[Types::<%= singular_name_camelized %>Type]
 

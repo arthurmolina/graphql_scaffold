@@ -31,6 +31,26 @@ module GraphqlScaffoldCommonMethods
     plural_name_snaked.camelcase
   end
 
+  def list_many
+    "all_#{plural_name_snaked}"
+  end
+
+  def list_one
+    singular_name_snaked
+  end
+
+  def create_one
+    "create_#{singular_name_snaked}"
+  end
+
+  def change_one
+    "change_#{singular_name_snaked}"
+  end
+
+  def destroy_one
+    "destroy_#{singular_name_snaked}"
+  end
+
   def model_name
     name.gsub('_', ' ').titlecase.gsub(' ', '')
   end
@@ -45,6 +65,10 @@ module GraphqlScaffoldCommonMethods
     else
       'id'
     end
+  end
+
+  def columns_type_without_primary_key
+    columns_types.select{|c| !c[:name].in?([primary_key, 'created_at', 'updated_at']) }
   end
 
   def columns_types
@@ -62,7 +86,7 @@ module GraphqlScaffoldCommonMethods
   end
 
   def columns_model
-    model.columns_hash.map{|k,v| {name: k, type: type(v.type), null: v.null}}
+    model.columns_hash.map{|k,v| {name: k, type: type(v.type), null: v.null, sample: sample(v.type)}}
   end
 
   def columns_myattributes
@@ -70,10 +94,10 @@ module GraphqlScaffoldCommonMethods
     res = res + myattributes.map{|element|
       div = element.split(':')
       type_defined = div[1].present? ? div[1].split('{')[0] : :string
-      {name: div[0], type: type(type_defined), null: false}
+      {name: div[0], type: type(type_defined), null: false, sample: sample(type_defined)}
     } 
-    res << {name: 'created_at', type: type(:datetime), null: false}
-    res << {name: 'updated_at', type: type(:datetime), null: false}
+    res << {name: 'created_at', type: type(:datetime), null: false, sample: sample(:datetime)}
+    res << {name: 'updated_at', type: type(:datetime), null: false, sample: sample(:datetime)}
   end
 
   def type(the_type)
@@ -82,6 +106,17 @@ module GraphqlScaffoldCommonMethods
       'Types::DateTimeType'
     when 'references'
       'Integer'
+    else
+      the_type.to_s.titlecase
+    end
+  end
+
+  def sample(the_type)
+    case the_type.to_s.downcase
+    when 'datetime'
+      Time.now.strftime("%d/%m/%Y %H:%M:%S")
+    when 'references', 'integer', 'float'
+      rand(1..10).to_s
     else
       the_type.to_s.titlecase
     end

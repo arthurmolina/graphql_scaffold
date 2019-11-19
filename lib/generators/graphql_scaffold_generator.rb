@@ -28,7 +28,6 @@ class GraphqlScaffoldGenerator < Rails::Generators::Base
   end
 
   def install_gems
-    return true
     require_gems if options[:donttouchgem].blank?
 
     Bundler.with_clean_env do
@@ -48,6 +47,7 @@ class GraphqlScaffoldGenerator < Rails::Generators::Base
     copy_file 'app/graphql/types/date_time_type.rb', 'app/graphql/types/date_time_type.rb'
     copy_file 'app/graphql/types/base_field.rb', 'app/graphql/types/base_field.rb'
     copy_file 'app/graphql/mutations/base_mutation.rb', 'app/graphql/mutations/base_mutation.rb'
+    copy_file 'test/integration/graphql_1st_test.rb', 'test/integration/graphql_1st_test.rb'
   end
 
   def generate_graphql_query
@@ -57,19 +57,20 @@ class GraphqlScaffoldGenerator < Rails::Generators::Base
     template 'app/graphql/mutations/change_table.rb', "app/graphql/mutations/change_#{singular_name_snaked}.rb"
     template 'app/graphql/mutations/create_table.rb', "app/graphql/mutations/create_#{singular_name_snaked}.rb"
     template 'app/graphql/mutations/destroy_table.rb', "app/graphql/mutations/destroy_#{singular_name_snaked}.rb"
+    template 'test/integration/graphql_table_test.rb', "test/integration/graphql_#{singular_name_snaked}_test.rb"
   end
 
   def add_in_query_type
     inject_into_file(
       'app/graphql/types/query_type.rb', 
-      "    field :all_#{plural_name_snaked}, function: Resolvers::#{plural_name_camelized}Search\n", 
+      "    field :#{list_many}, function: Resolvers::#{plural_name_camelized}Search\n", 
       after: "class QueryType < Types::BaseObject\n")
 
     inject_into_file(
       'app/graphql/types/mutation_type.rb', 
-      "\n    field :create_#{singular_name_snaked}, mutation: Mutations::Create#{singular_name_camelized}" +
-      "\n    field :change_#{singular_name_snaked}, mutation: Mutations::Change#{singular_name_camelized}" +
-      "\n    field :destroy_#{singular_name_snaked}, mutation: Mutations::Destroy#{singular_name_camelized}\n",
+      "\n    field :#{create_one}, mutation: Mutations::Create#{singular_name_camelized}" +
+      "\n    field :#{change_one}, mutation: Mutations::Change#{singular_name_camelized}" +
+      "\n    field :#{destroy_one}, mutation: Mutations::Destroy#{singular_name_camelized}\n",
       after: "class MutationType < Types::BaseObject\n")
   end
 
