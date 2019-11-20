@@ -24,6 +24,16 @@ class GraphqlScaffoldGenerator < Rails::Generators::Base
     end
   end
 
+  def install_gems
+    if check_gem_versions.present?
+      puts '='*80
+      puts '      ATENTION!!! ATENTION!!! ATENTION!!!'
+      puts '='*80
+      puts check_gem_versions.join("\n")
+      puts '='*80
+    end    
+  end
+
   def check_model_existence
     unless model_exists?
       if myattributes.present?
@@ -34,16 +44,6 @@ class GraphqlScaffoldGenerator < Rails::Generators::Base
         exit
       end
     end
-  end
-
-  def install_gems
-    if check_gem_versions.present?
-      puts '='*50
-      puts '      ATENTION!!!'
-      puts '='*50
-      puts check_gem_versions.join("\n")
-      puts '='*50
-    end    
   end
 
   def copy_files

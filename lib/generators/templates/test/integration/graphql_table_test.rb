@@ -8,9 +8,9 @@ class Graphql<%= plural_name_camelized %>Test < ActionDispatch::IntegrationTest
   test "can see a result" do
     gql = <<-GRAPHQL
       {
-        <%= list_many %>(first: 10, sort_by: {field: <%= columns_type_without_primary_key.sample[:name] %>, sortDirection: asc}) {
+        <%= list_many_camelized(:lower) %>(first: 10, sort_by: {field: <%= columns_type_without_primary_key.sample[:name] %>, sortDirection: asc}) {
 <% for attribute in columns_types -%>
-            <%= attribute[:name] %>
+            <%= attribute[:name].camelcase(:lower) %>
 <% end -%>
         }
       }
@@ -20,22 +20,22 @@ class Graphql<%= plural_name_camelized %>Test < ActionDispatch::IntegrationTest
     assert_response :success
     json = JSON.parse(response.body)
     assert_not_empty json['data']
-    assert_not_empty json['data']['<%= list_many %>']
+    assert_not_empty json['data']['<%= list_many_camelized(:lower) %>']
   end
 
   test "can add a record" do
     gql = <<-GRAPHQL
       mutation a {
-        <%= create_one %>(input: {
+        <%= create_one_camelized(:lower) %>(input: {
 <% for attribute in columns_type_without_primary_key -%>
-          <%= attribute[:name] %>: "<%= attribute[:sample] %>",
+          <%= attribute[:name].camelcase(:lower) %>: <%= attribute[:sample] %>,
 <% end -%>
           clientMutationId: "test-1"
         } ) 
         {
-          <%= singular_name_snaked %> {
+          <%= singular_name_camelized(:lower) %> {
 <% for attribute in columns_types -%>
-            <%= attribute[:name] %>
+            <%= attribute[:name].camelcase(:lower) %>
 <% end -%>
           }
           clientMutationId
@@ -46,14 +46,13 @@ class Graphql<%= plural_name_camelized %>Test < ActionDispatch::IntegrationTest
     post '/graphql', params: {query: gql}
     assert_response :success
     json = JSON.parse(response.body)
-    #puts response.body
     
     assert_not_empty json['data']
-    assert_not_empty json['data']['<%= create_one %>']
-    assert_not_empty json['data']['<%= create_one %>']['<%= singular_name_snaked %>']
-    assert_empty json['data']['<%= create_one %>']['errors']
+    assert_not_empty json['data']['<%= create_one_camelized(:lower) %>']
+    assert_not_empty json['data']['<%= create_one_camelized(:lower) %>']['<%= singular_name_camelized(:lower) %>']
+    assert_equal json['data']['<%= create_one_camelized(:lower) %>']['errors'], []
 
-    <%= primary_key %> = json['data']['<%= create_one %>']['<%= singular_name_snaked %>']['<%= primary_key %>']
+    <%= primary_key %> = json['data']['<%= create_one_camelized(:lower) %>']['<%= singular_name_camelized(:lower) %>']['<%= primary_key.camelcase(:lower) %>']
     assert_not_empty <%= singular_name_camelized %>.where(<%= primary_key %>: <%= primary_key %>)
   end
 
@@ -61,16 +60,16 @@ class Graphql<%= plural_name_camelized %>Test < ActionDispatch::IntegrationTest
     <%= primary_key %> = <%= singular_name_camelized %>.last.<%= primary_key %>
     gql = <<-GRAPHQL
       mutation a {
-        <%= change_one %>(input: {
-          <%= primary_key %>: "#{<%= primary_key %>}", 
+        <%= change_one_camelized(:lower) %>(input: {
+          <%= primary_key.camelcase(:lower) %>: "#{<%= primary_key %>}", 
 <% for attribute in columns_type_without_primary_key -%>
-          <%= attribute[:name] %>: "<%= attribute[:sample] %>",
+          <%= attribute[:name].camelcase(:lower) %>: <%= attribute[:sample] %>,
 <% end -%>
           clientMutationId: "test-2"} ) 
         {
-          <%= singular_name_snaked %> {
+          <%= singular_name_camelized(:lower) %> {
 <% for attribute in columns_types -%>
-            <%= attribute[:name] %>
+            <%= attribute[:name].camelcase(:lower) %>
 <% end -%>
           }
           clientMutationId
@@ -83,21 +82,20 @@ class Graphql<%= plural_name_camelized %>Test < ActionDispatch::IntegrationTest
     assert_response :success
     json = JSON.parse(response.body)
     assert_not_empty json['data']
-    assert_not_empty json['data']['<%= change_one %>']
-    assert_empty json['data']['<%= change_one %>']['errors']
-
-    assert_equal <%= singular_name_camelized %>.find(id).url, json['data']['<%= change_one %>']['<%= singular_name_snaked %>']['url']
+    assert_not_empty json['data']['<%= change_one_camelized(:lower) %>']
+    assert_equal json['data']['<%= change_one_camelized(:lower) %>']['errors'], []
+    assert_equal <%= singular_name_camelized %>.find(id).<%= columns_type_without_primary_key.first[:name] %>, json['data']['<%= change_one_camelized(:lower) %>']['<%= singular_name_camelized(:lower) %>']['<%= columns_type_without_primary_key.first[:name].camelcase(:lower) %>']
   end
 
   test "can destroy a record" do
     <%= primary_key %> = <%= singular_name_camelized %>.last.<%= primary_key %>
     gql = <<-GRAPHQL
       mutation a {
-        <%= destroy_one %>(input: {<%= primary_key %>: "#{<%= primary_key %>}", clientMutationId: "test-3"} ) 
+        <%= destroy_one_camelized(:lower) %>(input: {<%= primary_key.camelcase(:lower) %>: "#{<%= primary_key %>}", clientMutationId: "test-3"} ) 
         {
-          <%= singular_name_snaked %> {
+          <%= singular_name_camelized(:lower) %> {
 <% for attribute in columns_types -%>
-            <%= attribute[:name] %>
+            <%= attribute[:name].camelcase(:lower) %>
 <% end -%>
           }
           clientMutationId
@@ -110,8 +108,8 @@ class Graphql<%= plural_name_camelized %>Test < ActionDispatch::IntegrationTest
     assert_response :success
     json = JSON.parse(response.body)
     assert_not_empty json['data']
-    assert_not_empty json['data']['<%= destroy_one %>']
-    assert_empty json['data']['<%= destroy_one %>']['errors']
+    assert_not_empty json['data']['<%= destroy_one_camelized(:lower) %>']
+    assert_equal json['data']['<%= destroy_one_camelized(:lower) %>']['errors'], []
 
     assert_empty <%= singular_name_camelized %>.where(<%= primary_key %>: <%= primary_key %>)
   end

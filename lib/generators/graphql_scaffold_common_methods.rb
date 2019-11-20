@@ -19,8 +19,8 @@ module GraphqlScaffoldCommonMethods
     singular_name.gsub(' ', '_')
   end
 
-  def singular_name_camelized
-    singular_name_snaked.camelcase
+  def singular_name_camelized(type = :upper)
+    singular_name_snaked.camelcase(type)
   end
 
   def plural_name
@@ -31,8 +31,8 @@ module GraphqlScaffoldCommonMethods
     plural_name.gsub(' ', '_')
   end
 
-  def plural_name_camelized
-    plural_name_snaked.camelcase
+  def plural_name_camelized(type = :upper)
+    plural_name_snaked.camelcase(type)
   end
 
   def list_many
@@ -53,6 +53,26 @@ module GraphqlScaffoldCommonMethods
 
   def destroy_one
     "destroy_#{singular_name_snaked}"
+  end
+
+  def list_many_camelized(type = :upper)
+    list_many.camelcase(type)
+  end
+
+  def list_one_camelized(type = :upper)
+    list_one.camelcase(type)
+  end
+
+  def create_one_camelized(type = :upper)
+    create_one.camelcase(type)
+  end
+
+  def change_one_camelized(type = :upper)
+    change_one.camelcase(type)
+  end
+
+  def destroy_one_camelized(type = :upper)
+    destroy_one.camelcase(type)
   end
 
   def model_name
@@ -121,8 +141,10 @@ module GraphqlScaffoldCommonMethods
       Time.now.strftime("%d/%m/%Y %H:%M:%S")
     when 'references', 'integer', 'float'
       rand(1..10).to_s
+    when 'boolean'
+      ['true', 'false'].sample
     else
-      the_type.to_s.titlecase
+      '"' + the_type.to_s.titlecase + '"'
     end
   end
 
@@ -158,7 +180,7 @@ module GraphqlScaffoldCommonMethods
   def check_gem_versions
     required_gems.map{ |gem_item|
       if Gem.loaded_specs[gem_item[:name]].nil?
-        "This version of Graphql Scaffold requires the gem #{gem_item[:name]}, version #{gem_item[:version]}. Please add the following line in your Gemfile:\n\n  gem '#{gem_item[:name]}', '#{version}'\n"
+        "This version of Graphql Scaffold requires the gem #{gem_item[:name]}, version #{gem_item[:version]}. Please add the following line in your Gemfile:\n\n  gem '#{gem_item[:name]}', '#{gem_item[:version]}'\n"
       elsif (Gem.loaded_specs[gem_item[:name]].version <=> Gem::Version.new(gem_item[:version])) < 0 
         "The version of the gem #{gem_item[:name]} is not compatible with this version of Graphql Scaffold. We need at least version #{gem_item[:version]}."
       else
