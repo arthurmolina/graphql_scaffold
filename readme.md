@@ -1,4 +1,4 @@
-# graphql scaffold <img src="https://cloud.githubusercontent.com/assets/2231765/9094460/cb43861e-3b66-11e5-9fbf-71066ff3ab13.png" height="40" alt="graphql-ruby"/>
+# graphql scaffold <img src="https://raw.githubusercontent.com/arthurmolina/graphql_scaffold/master/graphql_scaffold.png" height="40" alt="graphql_scaffold"/>
 
 [![Build Status](https://travis-ci.org/arthurmolina/graphql-ruby.svg?branch=master)](https://travis-ci.org/arthurmolina/graphql_scaffold)
 [![Gem Version](https://badge.fury.io/rb/graphql_scaffold.svg)](https://rubygems.org/gems/graphql_scaffold)
