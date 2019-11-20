@@ -5,15 +5,15 @@ require 'graphql_scaffold/version'
 require 'date'
 
 Gem::Specification.new do |s|
-  s.name = 'graphql_scaffold'
-  s.version     = GraphqlScaffold::VERSION
-  s.date        = Date.today.to_s
-  s.platform    = Gem::Platform::RUBY
-  s.summary     = 'A good way to automatize graphql models'
-  s.authors     = ['Arthur Molina']
-  s.email       = ['arthurmolina@yahoo.com.br']
-  s.homepage    = 'https://github.com/arthurmolina/grapql_scaffold'
-  s.licenses    = 'MIT'
-  s.files       = Dir["{lib}/**/*", "LICENSE", "readme.md"]
+  s.name          = 'graphql_scaffold'
+  s.version       = GraphqlScaffold::VERSION
+  s.date          = Date.today.to_s
+  s.platform      = Gem::Platform::RUBY
+  s.summary       = 'A good way to automatize graphql models'
+  s.authors       = ['Arthur Molina']
+  s.email         = ['arthurmolina@yahoo.com.br']
+  s.homepage      = 'https://github.com/arthurmolina/graphql_scaffold'
+  s.licenses      = 'MIT'
+  s.files         = Dir["{lib}/**/*", "LICENSE", "readme.md"]
   s.require_paths = ['lib', 'lib/generators']
 end

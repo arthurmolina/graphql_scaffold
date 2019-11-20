@@ -8,18 +8,27 @@ class GraphqlScaffoldGenerator < Rails::Generators::Base
 
   source_root File.expand_path('../templates', __FILE__)
 
-  argument :name, type: :string, desc: 'Name of model (singular)'
+  argument :model_name, type: :string, desc: 'Name of model (singular)'
   argument :myattributes, type: :array, default: [], banner: 'field:type field:type'
 
-  class_option :namespace, default: nil
-  class_option :donttouchgem, default: nil
-  class_option :mountable_engine, default: true
+  class_option :namespace, default: nil, desc: 'Create a namespace for the Model and GraphQL.'
+  class_option :queries, type: :boolean, default: true, desc: 'Create the GraphQL Queries.'
+  class_option :mutations, type: :boolean, default: true, desc: 'Create the GraphQL Mutations.'
+  class_option :subscriptions, type: :boolean, default: true, desc: 'Create the GraphQL Subscriptions.'
+  class_option :tests, type: :boolean, default: true, desc: 'Create the GraphQL Tests.'
+
+  def check_what_to_do
+    if !queries && !mutations && !subscriptions
+      puts "\n  ** What do you want me to do? Nothing??? No queries, no mutations, no subscriptions...\n\n"
+      exit
+    end
+  end
 
   def check_model_existence
     unless model_exists?
       if myattributes.present?
         puts 'Generating model...'
-        generate('model', "#{name} #{myattributes.join(' ')}")
+        generate('model', "#{namespace.nil? ? '' : namespace+'::'}#{name} #{myattributes.join(' ')}")
       else
         puts "The model #{name} wasn't found. You can add attributes and generate the model with Graphql Scaffold."
         exit
@@ -28,50 +37,75 @@ class GraphqlScaffoldGenerator < Rails::Generators::Base
   end
 
   def install_gems
-    require_gems if options[:donttouchgem].blank?
-
-    Bundler.with_clean_env do
-      run 'bundle install'
-    end
-
-    if options[:donttouchgem].blank?
-      generate('graphql:install')
-      run 'bundle install'
-    end
+    if check_gem_versions.present?
+      puts '='*50
+      puts '      ATENTION!!!'
+      puts '='*50
+      puts check_gem_versions.join("\n")
+      puts '='*50
+    end    
   end
 
   def copy_files
-    copy_file 'app/graphql/resolvers/base_search_resolver.rb', 'app/graphql/resolvers/base_search_resolver.rb'
-    copy_file 'app/graphql/types/enums/operator.rb', 'app/graphql/types/enums/operator.rb'
-    copy_file 'app/graphql/types/enums/sort_dir.rb', 'app/graphql/types/enums/sort_dir.rb'
     copy_file 'app/graphql/types/date_time_type.rb', 'app/graphql/types/date_time_type.rb'
-    copy_file 'app/graphql/types/base_field.rb', 'app/graphql/types/base_field.rb'
-    copy_file 'app/graphql/mutations/base_mutation.rb', 'app/graphql/mutations/base_mutation.rb'
-    copy_file 'test/integration/graphql_1st_test.rb', 'test/integration/graphql_1st_test.rb'
+    # copy_file 'app/graphql/types/base_field.rb', 'app/graphql/types/base_field.rb'
+
+    if queries
+      copy_file 'app/graphql/resolvers/base_search_resolver.rb', 'app/graphql/resolvers/base_search_resolver.rb'
+      copy_file 'app/graphql/types/enums/operator.rb', 'app/graphql/types/enums/operator.rb'
+      copy_file 'app/graphql/types/enums/sort_dir.rb', 'app/graphql/types/enums/sort_dir.rb'
+    end
+
+    if mutations
+      copy_file 'app/graphql/mutations/base_mutation.rb', 'app/graphql/mutations/base_mutation.rb'
+    end
+
+    if subscriptions
+    end
+
+    if tests && (queries || mutations || subscriptions)
+      copy_file 'test/integration/graphql_1st_test.rb', 'test/integration/graphql_1st_test.rb'
+    end
   end
 
   def generate_graphql_query
     template 'app/graphql/types/enums/table_field.rb', "app/graphql/types/enums/#{plural_name_snaked}_field.rb"
     template 'app/graphql/types/table_type.rb', "app/graphql/types/#{singular_name_snaked}_type.rb"
-    template 'app/graphql/resolvers/table_search.rb', "app/graphql/resolvers/#{plural_name_snaked}_search.rb"
-    template 'app/graphql/mutations/change_table.rb', "app/graphql/mutations/change_#{singular_name_snaked}.rb"
-    template 'app/graphql/mutations/create_table.rb', "app/graphql/mutations/create_#{singular_name_snaked}.rb"
-    template 'app/graphql/mutations/destroy_table.rb', "app/graphql/mutations/destroy_#{singular_name_snaked}.rb"
-    template 'test/integration/graphql_table_test.rb', "test/integration/graphql_#{singular_name_snaked}_test.rb"
+    
+    if queries
+      template 'app/graphql/resolvers/table_search.rb', "app/graphql/resolvers/#{plural_name_snaked}_search.rb"
+    end
+
+    if mutations
+      template 'app/graphql/mutations/change_table.rb', "app/graphql/mutations/change_#{singular_name_snaked}.rb"
+      template 'app/graphql/mutations/create_table.rb', "app/graphql/mutations/create_#{singular_name_snaked}.rb"
+      template 'app/graphql/mutations/destroy_table.rb', "app/graphql/mutations/destroy_#{singular_name_snaked}.rb"
+    end
+
+    if subscriptions
+    end
+
+    if tests && (queries || mutations || subscriptions)
+      template 'test/integration/graphql_table_test.rb', "test/integration/graphql_#{singular_name_snaked}_test.rb"
+    end
   end
 
   def add_in_query_type
-    inject_into_file(
-      'app/graphql/types/query_type.rb', 
-      "    field :#{list_many}, function: Resolvers::#{plural_name_camelized}Search\n", 
-      after: "class QueryType < Types::BaseObject\n")
+    if queries
+      inject_into_file(
+        'app/graphql/types/query_type.rb', 
+        "    field :#{list_many}, function: Resolvers::#{plural_name_camelized}Search\n", 
+        after: "class QueryType < Types::BaseObject\n")
+    end
 
-    inject_into_file(
-      'app/graphql/types/mutation_type.rb', 
-      "\n    field :#{create_one}, mutation: Mutations::Create#{singular_name_camelized}" +
-      "\n    field :#{change_one}, mutation: Mutations::Change#{singular_name_camelized}" +
-      "\n    field :#{destroy_one}, mutation: Mutations::Destroy#{singular_name_camelized}\n",
-      after: "class MutationType < Types::BaseObject\n")
+    if mutations
+      inject_into_file(
+        'app/graphql/types/mutation_type.rb', 
+        "\n    field :#{create_one}, mutation: Mutations::Create#{singular_name_camelized}" +
+        "\n    field :#{change_one}, mutation: Mutations::Change#{singular_name_camelized}" +
+        "\n    field :#{destroy_one}, mutation: Mutations::Destroy#{singular_name_camelized}\n",
+        after: "class MutationType < Types::BaseObject\n")
+    end
   end
 
 end

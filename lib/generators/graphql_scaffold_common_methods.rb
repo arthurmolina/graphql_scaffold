@@ -7,6 +7,10 @@ module GraphqlScaffoldCommonMethods
     ActiveRecord::Base.connection.tables.include?(plural_name)
   end
 
+  def name
+    "#{namespace.nil? ? '' : 'namespace' + ' '}#{model_name}"
+  end
+
   def singular_name
     name.underscore.singularize
   end
@@ -122,18 +126,53 @@ module GraphqlScaffoldCommonMethods
     end
   end
 
-  def require_gems
-    gems = {
-      'graphql' => '1.9.15',
-      'search_object' => '1.2.0',
-      'search_object_graphql' => '0.1'
-    }
+  def queries
+    options['queries']
+  end
 
+  def mutations
+    options['mutations']
+  end
+
+  def subscriptions
+    options['subscriptions']
+  end
+
+  def tests
+    options['tests']
+  end
+
+  def required_gems
+    # {
+    #   'graphql' => '1.9.15',
+    #   'search_object' => '1.2.3',
+    #   'search_object_graphql' => '0.3'
+    # }
+    [
+      {name: 'graphql', version: '1.9.15'},
+      {name: 'search_object', version: '1.2.3'},
+      {name: 'search_object_graphql', version: '0.3'}
+    ]
+  end
+
+  def check_gem_versions
+    required_gems.map{ |gem_item|
+      if Gem.loaded_specs[gem_item[:name]].nil?
+        "This version of Graphql Scaffold requires the gem #{gem_item[:name]}, version #{gem_item[:version]}. Please add the following line in your Gemfile:\n\n  gem '#{gem_item[:name]}', '#{version}'\n"
+      elsif (Gem.loaded_specs[gem_item[:name]].version <=> Gem::Version.new(gem_item[:version])) < 0 
+        "The version of the gem #{gem_item[:name]} is not compatible with this version of Graphql Scaffold. We need at least version #{gem_item[:version]}."
+      else
+        nil
+      end
+    }.compact
+  end
+
+  def require_gems
     if !Dir.glob('./*.gemspec').empty?
-      puts "============> Engine : You must add gems to your main app \n #{gems.to_a.map{ |a| "gem '#{a[0]}'#{(a[1].nil? ? '' : ", '#{a[1]}'")} " }.join("\n")}"
+      puts "============> Engine : You must add gems to your main app \n #{required_gems.to_a.map{ |a| "gem '#{a[0]}'#{(a[1].nil? ? '' : ", '#{a[1]}'")} " }.join("\n")}"
     end
 
-    gems.each{ |gem_to_add, version|
+    required_gems.each{ |gem_to_add, version|
       gem(gem_to_add, version)
     }
   end
