@@ -47,9 +47,7 @@ class GraphqlScaffoldGenerator < Rails::Generators::Base
   end
 
   def copy_files
-    copy_file 'app/graphql/types/date_time_type.rb', 'app/graphql/types/date_time_type.rb'
     # copy_file 'app/graphql/types/base_field.rb', 'app/graphql/types/base_field.rb'
-
     if queries
       copy_file 'app/graphql/resolvers/base_search_resolver.rb', 'app/graphql/resolvers/base_search_resolver.rb'
       copy_file 'app/graphql/types/enums/operator.rb', 'app/graphql/types/enums/operator.rb'

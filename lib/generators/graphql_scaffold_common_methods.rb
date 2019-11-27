@@ -125,11 +125,14 @@ module GraphqlScaffoldCommonMethods
   end
 
   def type(the_type)
-    case the_type
-    when :datetime
-      'Types::DateTimeType'
-    when 'references'
+    case the_type.to_s.downcase
+    when 'date'
+      'GraphQL::Types::ISO8601Date'
+    when 'datetime'
+      'GraphQL::Types::ISO8601DateTime'
+    when 'references', 'integer', 'float'
       'Integer'
+    when 'json'
     else
       the_type.to_s.titlecase
     end
