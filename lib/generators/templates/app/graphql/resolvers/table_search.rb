@@ -11,8 +11,17 @@ class Resolvers::<%= plural_name_camelized %>Search < Resolvers::BaseSearchResol
   option :first, type: types.Int, with: :apply_first
   option :skip, type: types.Int, with: :apply_skip
 
+  # May change the defaults values here
+  # def max_limit
+  #   100
+  # end
+
+  # def min_limit
+  #   100
+  # end
+
   def apply_first(scope, value)
-    scope.limit(value)
+    scope.limit(between(value))
   end
 
   def apply_skip(scope, value)
@@ -61,8 +70,12 @@ class Resolvers::<%= plural_name_camelized %>Search < Resolvers::BaseSearchResol
 
   option :where, type: types[<%= plural_name_camelized %>WhereExp], with: :apply_filter
 
-  def apply_filter(scope, value)
-    where == '()' ? scope : scope.where(query_where(value))
-  end
+  # May change this specific for this class
+  # def fetch_results
+  #   return super unless context.present?
+  #   # Authentication here!
+  #   raise "Not connected or no permission to this query." unless context[:current_user].present?
+  #   super
+  # end
 
 end
